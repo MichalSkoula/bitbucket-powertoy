@@ -1,0 +1,30 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>{% block title %}{% endblock %}</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    </head>
+    <body>
+        <nav>
+            <h2>BitBucket PowerToy</h2>
+            
+            {% if session['username'] %}
+                <span>{{ session['username'] }}</span> | <a href="{{ url_for('logout') }}">Log Out</a>
+            {% endif %}
+        </nav>
+
+        <section class="content">
+            <header>
+                {% block header %}{% endblock %}
+            </header>
+
+            {% for message in get_flashed_messages() %}
+                <div class="flash">{{ message }}</div>
+            {% endfor %}
+
+            {% block content %}{% endblock %}
+        </section>
+    </body>
+</html>
