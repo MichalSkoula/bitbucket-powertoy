@@ -1,13 +1,45 @@
 {% extends 'base.html' %}
 
-{% block header %}
-  <h1>{% block title %}Index{% endblock %}</h1>
-{% endblock %}
+{% block title %}Issues{% endblock %}
 
 {% block content %}
 
-  {% for repo in repositories %}
-    <div class="repo">{{ repo|pprint }}</div>
-  {% endfor %}
+<table class="table js-sort-table">
+  <thead>
+    <th>Issue</th>
+    <th>ID</th>
+    <th>Priority</th>
+    <th>Repo</th>
+    <th>Created on</th>
+    <th>Updated</th>
+  </thead>
+  <tbody>
+    {% for repo in repositories %}
+      {% for issue in repo['open_issues'] %}
+        <tr>
+          
+          <td><a href="{{ issue['links']['html']['href'] }}">{{ issue['title'] }}</a></td>
+          <td>{{ issue['id'] }}</td>
+          <td>{{ issue['priority'] }}</td>
+          <td>
+            <div class="columns">
+              <div class="column is-one-quarter">
+                <img class="image is-24x24" src="{{ repo['links']['avatar']['href'] }}">
+              </div>
+              <div class="column">
+                <a href="{{ repo['links']['issues']['href'] }}">{{ repo['slug'] }}</a>
+              </div>
+            </div>
+          </td>
+          <td>{{ issue['created_on']|format_datetime }}</td>
+          <td>{{ issue['updated_on']|format_datetime }}</td>
+        </tr>
+      {% endfor %}
+    {% endfor %}
+  </tbody>
+</table>
+
+<hr>
+<div class="is-size-7">{{ repositories|pprint }}</div>
 
 {% endblock %}

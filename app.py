@@ -23,7 +23,7 @@ def index():
         # get them issues, if any
         final_repos = []
         for r in repositories['values']:
-            #try:
+            try:
                 issues = get(
                     'repositories/' + session['owner'] + '/' + r['slug'] + '/issues', 
                     'pagelen=100&q=' + urllib.parse.quote_plus('state="new" OR state="open"')
@@ -38,8 +38,8 @@ def index():
                 if final_issues:
                     r['open_issues'] = final_issues
                     final_repos.append(r)
-            #except:
-            #    pass
+            except:
+                pass
         return render_template('index.html', repositories=final_repos)
     else:
         return render_template('login.html')
@@ -64,6 +64,10 @@ def logout():
     session.pop('password', None)
     flash('You were successfully logged out')
     return redirect(url_for('index'))
+
+@app.template_filter()
+def format_datetime(value):
+    return value[0:10]
 
 def get(url, query = ''):
     return requests.get(

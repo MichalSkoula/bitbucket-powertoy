@@ -1,17 +1,25 @@
 {% extends 'base.html' %}
 
-{% block header %}
-  <h1>{% block title %}Log In{% endblock %}</h1>
-{% endblock %}
+{% block title %}Log In{% endblock %}
 
 {% block content %}
   <form method="post" action="login">
-    <label for="username">Username</label>
-    <input name="username" id="username">
-    <label for="password">Password</label>
-    <input type="password" name="password" id="password">
-    <label for="owner">Repositories Owner Username</label>
-    <input name="owner" id="owner" value="{{ session['owner'] }}">
-    <input type="submit" value="Log In">
+    <div class="field">
+      <label class="label" for="username">BitBucket Username</label>
+      <input class="input" name="username" id="username">
+    </div>
+    <div class="field">
+      <label class="label" for="password">BitBucket Password</label>
+      <input class="input" type="password" name="password" id="password">
+      <p class="help is-success"><a href="https://support.atlassian.com/bitbucket-cloud/docs/app-passwords/" target="_blank">App Password</a> in case you are using 2FA</p>
+    </div>
+    <div class="field">
+      <label class="label" for="owner">Repositories Owner Username </label>
+      <input class="input" name="owner" id="owner" value="{{ session['owner'] }}">
+      <p class="help is-success">If you leave this empty, it will get your repositories</p>
+    </div>
+    <div class="field">
+      <input class="button is-link" type="submit" value="Log In">
+    </div>
   </form>
 {% endblock %}

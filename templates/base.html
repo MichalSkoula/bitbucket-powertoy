@@ -1,30 +1,60 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>{% block title %}{% endblock %}</title>
+        <title>{% block title %}{% endblock %} - BitBucket PowerToy</title>
         <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='bulma.min.css') }}">
     </head>
     <body>
-        <nav>
-            <h2>BitBucket PowerToy</h2>
-            
-            {% if session['username'] %}
-                <span>{{ session['username'] }}</span> | <a href="{{ url_for('logout') }}">Log Out</a>
-            {% endif %}
-        </nav>
+        <section class="section">
+            <div class="container">
+                <nav class="level">
+                    <!-- Left side -->
+                    <div class="level-left">
+                      <div class="level-item">
+                        <h1 class="title">BitBucket PowerToy</h1>
+                      </div>
+                    </div>
+                  
+                    <!-- Right side -->
+                    <div class="level-right">
+                        {% if session['username'] %}
+                            <div class="level-item">
+                                <span>{{ session['username'] }}</span>
+                            </div>
+                            <div class="level-item">
+                                <a href="{{ url_for('logout') }}">Log Out</a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </nav>
 
-        <section class="content">
-            <header>
-                {% block header %}{% endblock %}
-            </header>
+                <section class="content">
+                    <header>
+                        {% block header %}{% endblock %}
+                    </header>
 
-            {% for message in get_flashed_messages() %}
-                <div class="flash">{{ message }}</div>
-            {% endfor %}
+                    {% for message in get_flashed_messages() %}
+                        <article class="message">
+                            <div class="message-body">
+                                {{ message }}
+                            </div>
+                        </article>
+                    {% endfor %}
 
-            {% block content %}{% endblock %}
+                    {% block content %}{% endblock %}
+                </section>
+            </div>
         </section>
+        <footer class="footer">
+            <div class="content has-text-centered">       
+                <p>A way of displaying all your issues across several BitBuckets' repos.</p>
+                <p><a href="https://skoula.cz">skoula.cz</a> | <a href="https://github.com/MichalSkoula/bitbucket-powertoy">GitHub</a></p>
+
+            </div>
+        </footer>
+        <script src="{{ url_for('static', filename='sort-table.min.js') }}"></script>
     </body>
 </html>
