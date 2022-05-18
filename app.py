@@ -6,13 +6,13 @@ import urllib.parse
 URL = "https://api.bitbucket.org/2.0/"
 
 app = Flask(__name__)
-app.secret_key = 'asdasdadadsasd'
+app.secret_key = 'asdasdadadsasd' #TODO store this in Azure
 
 @app.route("/")
 def index():
     if ('username' in session):
         try:
-            response = get('user')
+            get('user')
         except:
             flash('Cannot log in #2')
             return redirect(url_for('logout'))
