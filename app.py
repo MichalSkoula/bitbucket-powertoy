@@ -3,13 +3,10 @@ import requests
 from requests.auth import HTTPBasicAuth
 import urllib.parse
 
-app = Flask(__name__)
-
-# SETTINGS START #
 URL = "https://api.bitbucket.org/2.0/"
-app.secret_key = 'asdasdadadsasd'
-show_all_assignment_on_resolved_issues = True
-# SETTINGS END #
+
+app = Flask(__name__)
+app.secret_key = 'asdasdadadsasd' #TODO store this in Azure
 
 @app.route("/")
 @app.route("/<what>")
@@ -42,10 +39,12 @@ def index(what = 'open'):
                     'pagelen=100&sort=-updated_on&q=' + urllib.parse.quote_plus(really_what)
                 )
 
+                print('pagelen=100&sort=-updated_on&q=' + urllib.parse.quote_plus(really_what))
+
                 final_issues = []
                 for i in issues['values']:
-                    # show only my issues....or ALL issues if what=resolved
-                    if (show_all_assignment_on_resolved_issues == True and what == 'resolved') or (i['assignee'] != None and i['assignee']['account_id'] == session['account_id']):
+                
+                    if i['assignee'] != None and i['assignee']['account_id'] == session['account_id']:
                         final_issues.append(i)
                 
                 if final_issues:
