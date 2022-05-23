@@ -9,7 +9,8 @@ app = Flask(__name__)
 app.secret_key = 'asdasdadadsasd' #TODO store this in Azure
 
 @app.route("/")
-def index():
+@app.route("/<what>")
+def index(what = 'open'):
     if ('username' in session):
         try:
             get('user')
@@ -24,10 +25,21 @@ def index():
         final_repos = []
         for r in repositories['values']:
             try:
+                really_what = what
+
+                if what == 'hold':
+                    really_what = 'state="on hold"'
+                elif what == 'resolved':
+                    really_what = 'state="resolved"'
+                else:
+                    really_what = 'state="new" OR state="open"'
+
                 issues = get(
                     'repositories/' + session['owner'] + '/' + r['slug'] + '/issues', 
-                    'pagelen=100&q=' + urllib.parse.quote_plus('state="new" OR state="open"')
+                    'pagelen=100&sort=-updated_on&q=' + urllib.parse.quote_plus(really_what)
                 )
+
+                print('pagelen=100&sort=-updated_on&q=' + urllib.parse.quote_plus(really_what))
 
                 final_issues = []
                 for i in issues['values']:
@@ -40,7 +52,7 @@ def index():
                     final_repos.append(r)
             except:
                 pass
-        return render_template('index.html', repositories=final_repos)
+        return render_template('index.html', repositories=final_repos, what=what)
     else:
         return render_template('login.html')
 

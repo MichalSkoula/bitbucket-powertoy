@@ -22,10 +22,23 @@
                     <div class="level-right">
                         {% if session['username'] %}
                             <div class="level-item">
+                                <a class="button {% if what == 'open' %}is-active{% endif %}" href="{{ url_for('index', what='open') }}">New + Open</a>
+                            </div>
+
+                            <div class="level-item">
+                                <a class="button {% if what == 'hold' %}is-active{% endif %}" href="{{ url_for('index', what='hold') }}">On Hold</a>
+                            </div>
+
+                            <div class="level-item">
+                                <a class="button {% if what == 'resolved' %}is-active{% endif %}" href="{{ url_for('index', what='resolved') }}">Resolved</a>
+                            </div>
+
+                            <div class="level-item">
                                 <span>{{ session['username'] }}</span>
                             </div>
+
                             <div class="level-item">
-                                <a href="{{ url_for('logout') }}">Log Out</a>
+                                <a class="button" href="{{ url_for('logout') }}">Log Out</a>
                             </div>
                         {% endif %}
                     </div>
