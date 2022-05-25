@@ -1,10 +1,18 @@
 # bitbucket-powertoy
 A nice way of viewing all your issues across several BitBuckets' repos, in one place, in nice sortable table. Productivity boost!
 
-[Live demo](https://bitbucket-powertoy.azurewebsites.net/)
+![obrazek](https://user-images.githubusercontent.com/5922575/170380860-7b8bfae5-33a6-4d96-ac39-9fa136070aa5.png)
 
-Screenshot:
-![obrazek](https://user-images.githubusercontent.com/5922575/168697440-7e0cdfbe-8e0d-48b6-95a4-6cadb0c29962.png)
 
+## try it
+live demo - https://bitbucket-powertoy.azurewebsites.net/
+
+## install
+* (unix) source /path/to/venv/bin/activate
+* (win) venv\Scripts\Activate.ps1
+* pip install -r requirements.txt
+* flask run
+
+## about
 * Uses Python (Flask) and Bulma CSS
 * MIT Licence
