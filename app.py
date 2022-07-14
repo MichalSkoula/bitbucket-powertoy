@@ -1,7 +1,9 @@
 from flask import Flask, session, render_template, request, flash, redirect, url_for
+import grequests
 import requests
 from requests.auth import HTTPBasicAuth
 import urllib.parse
+
 
 app = Flask(__name__)
 
@@ -24,17 +26,45 @@ def index(what = 'open'):
         # get all repositories
         repositories = get('repositories/' + session['owner'], 'pagelen=100')
 
-        # get them issues, if any and load them into final_repos list
-        final_repos = []
+        # first, prepare get requests
+        regs = []
+        really_what = what
+        for r in repositories['values']:
+            if what == 'hold':
+                really_what = 'state="on hold"'
+            elif what == 'resolved':
+                really_what = 'state="resolved"'
+            else:
+                really_what = 'state="new" OR state="open"'
 
-        #executor = concurrent.futures.ProcessPoolExecutor(10)
-        #futures = [executor.submit(try_my_operation, item) for item in items]
-        #concurrent.futures.wait(futures)
+            regs.append(
+                grequests.get(
+                    URL + 'repositories/' + session['owner'] + '/' + r['slug'] + '/issues?pagelen=100&sort=-updated_on&q=' + urllib.parse.quote_plus(really_what),
+                    auth=HTTPBasicAuth(session['username'], session['password'])
+                )
+            )
+
+        # fire all get requests at once
+        result = grequests.map(regs);
+
+        # find issues for repos
+        final_issues = []
+        for r in result:
+            issues = r.json()
+            final_issues.append(issues['values']);
 
         for r in repositories['values']:
-            load_issues(r, what, final_repos)
+            for fi in final_issues:
+                if fi and fi[0]['repository']['full_name'] == r['full_name']:
+                    # we found issues for this repo
+                    r['open_issues'] = []
+                    for i in fi:
+                        # show only my issues....or ALL issues if what=resolved
+                        if (show_all_assignment_on_resolved_issues == True and what == 'resolved') or (i['assignee'] != None and i['assignee']['account_id'] == session['account_id']):
+                            r['open_issues'].append(i)
+                    continue
 
-        return render_template('index.html', repositories=final_repos, what=what)
+        return render_template('index.html', repositories=repositories['values'], what=what)
     else:
         return render_template('login.html')
 
@@ -68,32 +98,3 @@ def get(url, query = ''):
         URL + url + '?' + query,
         auth=HTTPBasicAuth(session['username'], session['password'])
     ).json()
-
-def load_issues(r, what, final_repos):
-    return_issues = []
-
-    try:
-        really_what = what
-
-        if what == 'hold':
-            really_what = 'state="on hold"'
-        elif what == 'resolved':
-            really_what = 'state="resolved"'
-        else:
-            really_what = 'state="new" OR state="open"'
-
-        issues = get(
-            'repositories/' + session['owner'] + '/' + r['slug'] + '/issues', 
-            'pagelen=100&sort=-updated_on&q=' + urllib.parse.quote_plus(really_what)
-        )
-
-        for i in issues['values']:
-            # show only my issues....or ALL issues if what=resolved
-            if (show_all_assignment_on_resolved_issues == True and what == 'resolved') or (i['assignee'] != None and i['assignee']['account_id'] == session['account_id']):
-                return_issues.append(i)
-        
-        if return_issues:
-            r['open_issues'] = return_issues
-            final_repos.append(r)
-    except:
-        pass
