@@ -3,10 +3,6 @@ A nice way of viewing all your issues across several BitBuckets' repos, in one p
 
 ![obrazek](https://user-images.githubusercontent.com/5922575/170380860-7b8bfae5-33a6-4d96-ac39-9fa136070aa5.png)
 
-
-## try it
-live demo - https://bitbucket-powertoy.azurewebsites.net/
-
 ## install
 * (unix) source /path/to/venv/bin/activate
 * (win) venv\Scripts\Activate.ps1
