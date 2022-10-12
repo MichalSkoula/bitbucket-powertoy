@@ -30,6 +30,7 @@ def index(what = 'open'):
         issues_collection = load_issues(repositories['values'], what)
 
         # find issues for repos
+        issues_count = 0
         for r in repositories['values']:
             for issues in issues_collection:
                 issues = issues.json()
@@ -41,9 +42,10 @@ def index(what = 'open'):
                         # show only my issues....or ALL issues if what=resolved
                         if (show_all_assignment_on_resolved_issues == True and what == 'resolved') or (i['assignee'] != None and i['assignee']['account_id'] == session['account_id']):
                             r['open_issues'].append(i)
+                            issues_count += 1
                     continue
 
-        return render_template('index.html', repositories=repositories['values'], what=what)
+        return render_template('index.html', repositories=repositories['values'], what=what, issues_count=issues_count)
     else:
         return render_template('login.html')
 
