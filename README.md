@@ -3,9 +3,10 @@ A nice way of viewing all your issues across several BitBuckets' repos, in one p
 
 ![obrazek](https://user-images.githubusercontent.com/5922575/170380860-7b8bfae5-33a6-4d96-ac39-9fa136070aa5.png)
 
-[demo](https://bitbucket.skoula.cz)
+**[demo](https://bitbucket.skoula.cz)**
 
-[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/mskoula)
+<a href="https://www.buymeacoffee.com/mskoula"><img src="https://www.buymeacoffee.com/assets/img/guidelines/download-assets-sm-1.svg" height="40"></a>
+<a href="https://paypal.me/truehipstercz?country.x=CZ&locale.x=en_US"><img src="https://github.com/andreostrovsky/donate-with-paypal/blob/master/blue.svg" height="40"></a>
 
 ## install
 * (unix) source /path/to/venv/bin/activate
