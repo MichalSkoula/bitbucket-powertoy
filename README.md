@@ -5,6 +5,8 @@ A nice way of viewing all your issues across several BitBuckets' repos, in one p
 
 [demo](https://bitbucket.skoula.cz)
 
+[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/mskoula)
+
 ## install
 * (unix) source /path/to/venv/bin/activate
 * (win) venv\Scripts\Activate.ps1
