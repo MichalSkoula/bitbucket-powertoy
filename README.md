@@ -8,10 +8,11 @@ A nice way of viewing all your issues across several BitBuckets' repos, in one p
 
 
 ## install
+* (in /app) python -m venv venv
 * (unix) source /path/to/venv/bin/activate
 * (win) venv\Scripts\Activate.ps1
 * pip install -r requirements.txt
-* flask run
+* (in /) flask run
 
 ## about
 * Uses Python (Flask) and Bulma CSS
