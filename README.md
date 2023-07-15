@@ -17,6 +17,7 @@ A nice way of viewing all your issues across several BitBuckets' repos, in one p
 ## about
 * Uses Python (Flask) and Bulma CSS
 * MIT Licence
+* https://skoula.cz
 
 
 <a href="https://www.buymeacoffee.com/mskoula"><img src="https://www.buymeacoffee.com/assets/img/guidelines/download-assets-sm-1.svg" height="40"></a>
