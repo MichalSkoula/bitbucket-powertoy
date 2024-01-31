@@ -4,39 +4,49 @@
 
 {% block content %}
 
-<table class="table js-sort-table">
-  <thead>
-    <th>Issues ({{ issues_count }})</th>
-    <th>ID</th>
-    <th>Priority</th>
-    <th>Repo</th>
-    <th>Created on</th>
-    <th>Updated</th>
-  </thead>
-  <tbody>
-    {% for repo in repositories %}
-      {% for issue in repo['open_issues'] %}
-        <tr>
-          
-          <td><a href="{{ issue['links']['html']['href'] }}">{{ issue['title'] }}</a></td>
-          <td>{{ issue['id'] }}</td>
-          <td>{{ issue['priority'] }}</td>
-          <td>
-            <div class="columns">
-              <div class="column is-one-quarter">
-                <img class="image is-24x24" src="{{ repo['links']['avatar']['href'] }}">
-              </div>
-              <div class="column">
-                <a target="_blank" href="{{ repo['links']['html']['href'] }}/issues?status=new&status=open&status=submitted&is_spam=!spam&sort=-updated_on">{{ repo['slug'] }}</a>
-              </div>
-            </div>
-          </td>
-          <td>{{ issue['created_on']|format_datetime }}</td>
-          <td>{{ issue['updated_on']|format_datetime }}</td>
-        </tr>
-      {% endfor %}
-    {% endfor %}
-  </tbody>
+<table class="table js-sort-table" id="issues-table">
+	<thead>
+		<th>Issues ({{ issues_count }})</th>
+		<th>ID</th>
+		<th>Priority</th>
+		<th>Repo</th>
+		<th>Created on</th>
+		<th>Updated</th>
+	</thead>
+	<tbody>
+		{% for repo in repositories %}
+		{% for issue in repo['open_issues'] %}
+		<tr>
+
+			<td><a href="{{ issue['links']['html']['href'] }}">{{ issue['title'] }}</a></td>
+			<td>{{ issue['id'] }}</td>
+			<td>
+				<div class="columns">
+					<div class="column is-one-quarter has-text-right">
+						<img width="24" height="24"
+							src="{{ url_for('static', filename='images/' + issue['priority'] + '.svg') }}" />
+					</div>
+					<div class="column">{{ issue['priority'] }}</div>
+				</div>
+			</td>
+			<td>
+				<div class="columns">
+					<div class="column is-one-quarter">
+						<img width="24" height="24" class="image is-24x24" src="{{ repo['links']['avatar']['href'] }}">
+					</div>
+					<div class="column">
+						<a target="_blank"
+							href="{{ repo['links']['html']['href'] }}/issues?status=new&status=open&status=submitted&is_spam=!spam&sort=-updated_on">{{
+							repo['slug'] }}</a>
+					</div>
+				</div>
+			</td>
+			<td>{{ issue['created_on']|format_datetime }}</td>
+			<td>{{ issue['updated_on']|format_datetime }}</td>
+		</tr>
+		{% endfor %}
+		{% endfor %}
+	</tbody>
 </table>
 
 <!--

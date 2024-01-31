@@ -11,3 +11,8 @@
 .js-sort-table th {
     cursor: pointer;
 }
+
+.js-sort-table img {
+    position: relative;
+    top: 1px;
+}

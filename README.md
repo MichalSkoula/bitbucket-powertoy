@@ -1,5 +1,5 @@
 # bitbucket-powertoy
-A nice way of viewing all your issues across several BitBuckets' repos, in one place, in nice sortable table. Productivity boost!
+A unique way of displaying all your issues across all your BitBuckets' repositories. All in one place, in a nicely sortable table. A real boost to productivity!
 
 ![obrazek](https://user-images.githubusercontent.com/5922575/170380860-7b8bfae5-33a6-4d96-ac39-9fa136070aa5.png)
 
@@ -7,12 +7,14 @@ A nice way of viewing all your issues across several BitBuckets' repos, in one p
 
 
 
-## install
-* (in /app) python -m venv venv
+## install & run
+* cd app
+* python -m venv venv
 * (unix) source /path/to/venv/bin/activate
 * (win) venv\Scripts\Activate.ps1
 * pip install -r requirements.txt
-* (in /) flask run
+* cd ../
+* flask run
 
 ## about
 * Uses Python (Flask) and Bulma CSS
