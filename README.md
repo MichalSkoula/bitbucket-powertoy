@@ -8,12 +8,11 @@ A unique way of displaying all your issues across all your BitBuckets' repositor
 
 
 ## install & run
-* cd app
+* mkdir venv
 * python -m venv venv
 * (unix) source /path/to/venv/bin/activate
 * (win) venv\Scripts\Activate.ps1
-* pip install -r requirements.txt
-* cd ../
+* pip install -r powertoy/requirements.txt
 * flask --debug run
 
 
