@@ -81,6 +81,10 @@
 			sortTable(document.getElementById('issues-table'), 2, 1);
 		}
 		window.addEventListener ? window.addEventListener('load', _initialSort, false) : window.attachEvent && window.attachEvent('onload', _initialSort);
+
+		document.getElementById('toggle-button').addEventListener('click', function() {
+			document.getElementById('additional-tables').classList.toggle('is-hidden');
+		});
 	</script>
 </body>
 

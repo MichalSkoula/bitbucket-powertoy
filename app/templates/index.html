@@ -4,9 +4,11 @@
 
 {% block content %}
 
-<table class="table js-sort-table" id="issues-table">
+<h2>Issues</h2>
+
+<table class="table js-sort-table mb-5 is-hoverable" id="issues-table">
 	<thead>
-		<th>Issues ({{ issues_count }})</th>
+		<th>Issues ({{ issues_count }}{% if session['critical'] %} <span class="has-text-grey">Only critical+</span>{% endif %})</th>
 		<th>ID</th>
 		<th>Priority</th>
 		<th>Repo</th>
@@ -49,8 +51,38 @@
 	</tbody>
 </table>
 
-<!--
-<div class="is-size-7">{{ repositories|pprint }}</div>
--->
+<button id="toggle-button" class="button is-small is-pulled-right">Show / Hide Additional Stats</button>
 
+<div id="additional-tables" class="is-hidden columns mt-5">
+	<div class="column">
+		<h3>Issues count by user</h3>
+		<table class="table is-narrow is-hoverable">
+			<tr>
+				<th>User ID</th>
+				<th>Issue Count</th>
+			</tr>
+			{% for user_id, issue_count in user_issue_count.items() %}
+			<tr>
+				<td>{{ user_id }}</td>
+				<td>{{ issue_count }}</td>
+			</tr>
+			{% endfor %}
+		</table>
+	</div>
+	<div class="column">
+		<h3>Repositories with issues</h3>
+		<table class="table is-narrow is-hoverable">
+			<tr>
+				<th>Repository</th>
+				<th>Issue Count</th>
+			</tr>
+			{% for repo_name, issue_count in repositories_with_issues.items() %}
+			<tr>
+				<td>{{ repo_name }}</td>
+				<td>{{ issue_count }}</td>
+			</tr>
+			{% endfor %}
+		</table>
+	</div>
+</div>
 {% endblock %}

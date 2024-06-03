@@ -11,15 +11,20 @@
 	<div class="field">
 		<label class="label" for="password">BitBucket Password</label>
 		<input class="input" type="password" name="password" id="password">
-		<p class="help is-success"><a href="https://support.atlassian.com/bitbucket-cloud/docs/app-passwords/"
+		<p class="help"><a href="https://support.atlassian.com/bitbucket-cloud/docs/app-passwords/"
 				target="_blank">App Password</a> in case you are using 2FA</p>
 	</div>
 	<div class="field">
 		<label class="label" for="owner">Repositories Owner Username </label>
 		<input class="input" name="owner" id="owner" value="{{ session['owner'] }}">
-		<p class="help is-success">If you leave this empty, it will get your repositories</p>
+		<p class="help">If you leave this empty, it will get your repositories</p>
 	</div>
 	<div class="field">
+		<input type="checkbox" id="critical" name="critical" class="is-checkradio" checked>
+		<label for="critical">Only <strong>critical+</strong> issues</label>
+	</div>
+
+	<div class="field mt-5">
 		<input class="button is-link" type="submit" value="Log In">
 	</div>
 </form>

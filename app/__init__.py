@@ -23,14 +23,18 @@ def index(what = 'open'):
             flash('Cannot log in #2')
             return redirect(url_for('logout'))
 
+        # some stats variables 
+        user_issue_count = {}
+        issues_count = 0
+        repositories_with_issues = {}
+
         # get all repositories
         repositories = get('repositories/' + session['owner'], 'pagelen=100')
 
         # get all issues - parallel requests
-        issues_collection = load_issues(repositories['values'], what)
+        issues_collection = load_issues(repositories['values'], what, session['critical'])
 
         # find issues for repos
-        issues_count = 0
         for r in repositories['values']:
             for issues in issues_collection:
                 issues = issues.json()
@@ -38,14 +42,25 @@ def index(what = 'open'):
                 if issues and issues[0]['repository']['full_name'] == r['full_name']:
                     # we found issues for this repo
                     r['open_issues'] = []
+                    repositories_with_issues[r['full_name']] = len(issues)
                     for i in issues:
                         # show only my issues....or ALL issues if what=resolved
                         if (show_all_assignment_on_resolved_issues == True and what == 'resolved') or (i['assignee'] != None and i['assignee']['account_id'] == session['account_id']):
                             r['open_issues'].append(i)
                             issues_count += 1
-                    continue
 
-        return render_template('index.html', repositories=repositories['values'], what=what, issues_count=issues_count)
+                        # Check if the key exists in the dictionary, if not, return 0 and add 1
+                        if (i['assignee'] != None):
+                            user_issue_count[i['assignee']['display_name']] = user_issue_count.get(i['assignee']['display_name'], 0) + 1
+                    continue
+                
+        # sort user_issue_count by value desc
+        user_issue_count = dict(sorted(user_issue_count.items(), key=lambda item: item[1], reverse=True))
+
+        # sort repositories_with_issues by value desc
+        repositories_with_issues = dict(sorted(repositories_with_issues.items(), key=lambda item: item[1], reverse=True))
+
+        return render_template('index.html', repositories=repositories['values'], what=what, issues_count=issues_count, user_issue_count=user_issue_count, repositories_with_issues=repositories_with_issues)
     else:
         return render_template('login.html')
 
@@ -54,6 +69,7 @@ def login():
     try:
         session['username'] = request.form.get('username')
         session['password'] = request.form.get('password')
+        session['critical'] = request.form.get('critical') != None
         session['owner'] = request.form.get('owner') if request.form.get('owner') != "" else request.form.get('username')
 
         response = get('user')
@@ -82,17 +98,22 @@ def get(url, query = ''):
     ).json()
 
 # async - grequests
-def load_issues(repositories, what):
+def load_issues(repositories, what, only_critical_and_blocker = False):
     # first, prepare get requests
     regs = []
     really_what = what
+
     for r in repositories:
+        # https://developer.atlassian.com/cloud/bitbucket/rest/intro#filtering
         if what == 'hold':
-            really_what = 'state="on hold"'
+            really_what = '(state="on hold")'
         elif what == 'resolved':
-            really_what = 'state="resolved"'
+            really_what = '(state="resolved")'
         else:
-            really_what = 'state="new" OR state="open"'
+            really_what = '(state="new" OR state="open")'
+
+        if only_critical_and_blocker:
+            really_what += 'AND (priority > "major")'
         
         regs.append(
             grequests.get(
@@ -102,4 +123,4 @@ def load_issues(repositories, what):
         )
 
     # fire all get requests at once
-    return grequests.map(regs);
+    return grequests.map(regs)
