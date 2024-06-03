@@ -14,7 +14,8 @@ A unique way of displaying all your issues across all your BitBuckets' repositor
 * (win) venv\Scripts\Activate.ps1
 * pip install -r requirements.txt
 * cd ../
-* flask run
+* flask --debug run
+
 
 ## about
 * Uses Python (Flask) and Bulma CSS
