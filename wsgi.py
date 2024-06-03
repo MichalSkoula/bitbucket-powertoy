@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 
-import sys
+from powertoy.app import app
 
-sys.path.insert(0, '/var/www/bitbucket.skoula.cz')
-
-from app import app as application
+application = app
