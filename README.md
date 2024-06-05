@@ -13,7 +13,7 @@ A unique way of displaying all your issues across all your BitBuckets' repositor
 * (unix) source /path/to/venv/bin/activate
 * (win) venv\Scripts\Activate.ps1
 * pip install -r powertoy/requirements.txt
-* flask --debug run
+* flask --debug run or python powertoy/app.py 
 
 
 ## about

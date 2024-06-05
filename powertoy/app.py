@@ -1,8 +1,10 @@
+import os
+import urllib.parse
+
 from flask import Flask, session, render_template, request, flash, redirect, url_for
 import grequests
 import requests
 from requests.auth import HTTPBasicAuth
-import urllib.parse
 
 
 app = Flask(__name__)
@@ -53,7 +55,7 @@ def index(what = 'open'):
                         if (i['assignee'] != None):
                             user_issue_count[i['assignee']['display_name']] = user_issue_count.get(i['assignee']['display_name'], 0) + 1
                     continue
-                
+
         # sort user_issue_count by value desc
         user_issue_count = dict(sorted(user_issue_count.items(), key=lambda item: item[1], reverse=True))
 
@@ -97,30 +99,36 @@ def get(url, query = ''):
         auth=HTTPBasicAuth(session['username'], session['password'])
     ).json()
 
+
 # async - grequests
-def load_issues(repositories, what, only_critical_and_blocker = False):
+def load_issues(repositories, issue_state, show_only_critical_issues=False):
     # first, prepare get requests
     regs = []
-    really_what = what
+    ISSUE_STATES_QUERY_MAP = {
+        'hold': '(state="on hold")',
+        'resolved': '(state="resolved")',
+        True: 'AND (priority > "major")'
+    }
 
-    for r in repositories:
+    for repository in repositories:
         # https://developer.atlassian.com/cloud/bitbucket/rest/intro#filtering
-        if what == 'hold':
-            really_what = '(state="on hold")'
-        elif what == 'resolved':
-            really_what = '(state="resolved")'
-        else:
-            really_what = '(state="new" OR state="open")'
+        current_issue_state = ISSUE_STATES_QUERY_MAP.get(
+            show_only_critical_issues if show_only_critical_issues else issue_state,
+            '(state="new" OR state="open")'
+        )
 
-        if only_critical_and_blocker:
-            really_what += 'AND (priority > "major")'
-        
         regs.append(
             grequests.get(
-                URL + 'repositories/' + session['owner'] + '/' + r['slug'] + '/issues?pagelen=100&sort=-updated_on&q=' + urllib.parse.quote_plus(really_what),
+                URL + 'repositories/' + session['owner'] + '/' + repository[
+                    'slug'] + '/issues?pagelen=100&sort=-updated_on&q=' + urllib.parse.quote_plus(current_issue_state),
                 auth=HTTPBasicAuth(session['username'], session['password'])
             )
         )
 
     # fire all get requests at once
     return grequests.map(regs)
+
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='127.0.0.1', port=port, debug=True)
