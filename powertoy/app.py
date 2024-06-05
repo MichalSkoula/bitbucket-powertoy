@@ -12,7 +12,10 @@ app = Flask(__name__)
 URL = "https://api.bitbucket.org/2.0/"
 app.secret_key = 'asdasdadadsasd'
 show_all_assignment_on_resolved_issues = True
+
+
 # SETTINGS END #
+
 
 @app.route("/")
 @app.route("/<what>")
@@ -37,26 +40,33 @@ def index(what='open'):
     issues_collection = load_issues(repositories['values'], what, session['critical'])
 
     # find issues for repos
-    for r in repositories['values']:
-        for issues in issues_collection:
-            issues = issues.json()
-            issues = issues['values']
-            if issues and issues[0]['repository']['full_name'] == r['full_name']:
-                # we found issues for this repo
-                r['open_issues'] = []
-                repositories_with_issues[r['full_name']] = len(issues)
-                for i in issues:
-                    # show only my issues....or ALL issues if what=resolved
-                    if (show_all_assignment_on_resolved_issues == True and what == 'resolved') or (
-                            i['assignee'] != None and i['assignee']['account_id'] == session['account_id']):
-                        r['open_issues'].append(i)
-                        issues_count += 1
+    for repository in repositories['values']:
 
-                    # Check if the key exists in the dictionary, if not, return 0 and add 1
-                    if (i['assignee'] != None):
-                        user_issue_count[i['assignee']['display_name']] = user_issue_count.get(
-                            i['assignee']['display_name'], 0) + 1
+        for issues in issues_collection:
+            issues = issues.json().get('values')
+
+            if not issues or not issues[0]['repository']['full_name'] == repository['full_name']:
+                # no issues or repo does not have issue tracker?
                 continue
+
+            # we found issues for this repo
+            repository['open_issues'] = []
+            repositories_with_issues[repository['full_name']] = len(issues)
+            for issue in issues:
+
+                if (show_all_assignment_on_resolved_issues is not True or what != 'resolved') and (
+                        issue['assignee'] is None or issue['assignee']['account_id'] != session['account_id']):
+                    # filter out issues that are not assigned to currently logged-in user
+                    continue
+
+                # show only my issues....or ALL issues if what=resolved
+                repository['open_issues'].append(issue)
+                issues_count += 1
+
+                # Check if the key exists in the dictionary, if not, return 0 and add 1
+                if issue['assignee'] is not None:
+                    user_issue_count[issue['assignee']['display_name']] = user_issue_count.get(
+                        issue['assignee']['display_name'], 0) + 1
 
     # sort user_issue_count by value desc
     user_issue_count = dict(sorted(user_issue_count.items(), key=lambda item: item[1], reverse=True))
@@ -91,7 +101,11 @@ def login():
         # So it is possible that we are lying to the user here
         flash('Username or Password is wrong')
     else:
-        session['account_id'] = response['account_id']
+        acc_id = response.get('account_id')
+        if not acc_id:
+            raise ValueError("Cannot set account ID")
+
+        session['account_id'] = acc_id
         flash('You were successfully logged in')
     return redirect(url_for('index'))
 
@@ -102,6 +116,7 @@ def logout():
     session.pop('password', None)
     flash('You were successfully logged out')
     return redirect(url_for('index'))
+
 
 @app.template_filter()
 def format_datetime(value):
@@ -116,12 +131,12 @@ def fetch_repository_data(url, query=''):
 
     response = requests.get(url=URL + url + '?' + query, auth=HTTPBasicAuth(*credentials))
     if not response.ok:
-        raise ValueError("Bad response: {}".format(response.status_code))
+        raise ValueError("Bad response - status code:{}\n{}".format(response.status_code, response.text))
     return response.json()
 
 
 # async - grequests
-def load_issues(repositories, what, only_critical_and_blocker = False):
+def load_issues(repositories, what, only_critical_and_blocker=False):
     # first, prepare get requests
     regs = []
     really_what = what
@@ -140,7 +155,8 @@ def load_issues(repositories, what, only_critical_and_blocker = False):
 
         regs.append(
             grequests.get(
-                URL + 'repositories/' + session['owner'] + '/' + r['slug'] + '/issues?pagelen=100&sort=-updated_on&q=' + urllib.parse.quote_plus(really_what),
+                URL + 'repositories/' + session['owner'] + '/' + r[
+                    'slug'] + '/issues?pagelen=100&sort=-updated_on&q=' + urllib.parse.quote_plus(really_what),
                 auth=HTTPBasicAuth(session['username'], session['password'])
             )
         )
@@ -150,5 +166,5 @@ def load_issues(repositories, what, only_critical_and_blocker = False):
 
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
+    port = int(os.environ.get("PORT", 8000))
     app.run(host='127.0.0.1', port=port, debug=True)
