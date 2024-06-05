@@ -136,27 +136,26 @@ def fetch_repository_data(url, query=''):
 
 
 # async - grequests
-def load_issues(repositories, what, only_critical_and_blocker=False):
+def load_issues(repositories, issue_state, show_only_critical_issues=False):
     # first, prepare get requests
     regs = []
-    really_what = what
+    ISSUE_STATES_QUERY_MAP = {
+        'hold': '(state="on hold")',
+        'resolved': '(state="resolved")',
+        True: 'AND (priority > "major")'
+    }
 
-    for r in repositories:
+    for repository in repositories:
         # https://developer.atlassian.com/cloud/bitbucket/rest/intro#filtering
-        if what == 'hold':
-            really_what = '(state="on hold")'
-        elif what == 'resolved':
-            really_what = '(state="resolved")'
-        else:
-            really_what = '(state="new" OR state="open")'
-
-        if only_critical_and_blocker:
-            really_what += 'AND (priority > "major")'
+        current_issue_state = ISSUE_STATES_QUERY_MAP.get(
+            show_only_critical_issues if show_only_critical_issues else issue_state,
+            '(state="new" OR state="open")'
+        )
 
         regs.append(
             grequests.get(
-                URL + 'repositories/' + session['owner'] + '/' + r[
-                    'slug'] + '/issues?pagelen=100&sort=-updated_on&q=' + urllib.parse.quote_plus(really_what),
+                URL + 'repositories/' + session['owner'] + '/' + repository[
+                    'slug'] + '/issues?pagelen=100&sort=-updated_on&q=' + urllib.parse.quote_plus(current_issue_state),
                 auth=HTTPBasicAuth(session['username'], session['password'])
             )
         )
