@@ -12,8 +12,6 @@ app = Flask(__name__)
 URL = "https://api.bitbucket.org/2.0/"
 app.secret_key = 'asdasdadadsasd'
 show_all_assignment_on_resolved_issues = True
-
-
 # SETTINGS END #
 
 
@@ -52,8 +50,8 @@ def index(what='open'):
             # we found issues for this repo
             repository['open_issues'] = []
             repositories_with_issues[repository['full_name']] = len(issues)
-            for issue in issues:
 
+            for issue in issues:
                 if (show_all_assignment_on_resolved_issues is not True or what != 'resolved') and (
                         issue['assignee'] is None or issue['assignee']['account_id'] != session['account_id']):
                     # filter out issues that are not assigned to currently logged-in user
