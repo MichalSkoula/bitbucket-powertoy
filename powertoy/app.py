@@ -21,18 +21,17 @@ def index(what='open'):
     if 'username' not in session:
         return render_template('login.html')
 
-    try:
-        fetch_repository_data('user')
-    except ValueError:
-        return redirect(url_for('logout'))
-
     # some stats variables
     user_issue_count = {}
     issues_count = 0
     repositories_with_issues = {}
 
     # get all repositories
-    repositories = fetch_repository_data('repositories/' + session['owner'], 'pagelen=100')
+    try:
+        repositories = fetch_repository_data('repositories/' + session['owner'], 'pagelen=100')
+    except Exception as e:
+        flash(str(e))
+        return redirect(url_for('logout'))
 
     # get all issues - parallel requests
     issues_collection = load_issues(repositories['values'], what, session['critical'])
@@ -105,7 +104,7 @@ def login():
 
         session['account_id'] = acc_id
         flash('You were successfully logged in')
-    return redirect(url_for('index'))
+        return redirect(url_for('index'))
 
 
 @app.route("/logout", methods=['GET'])
@@ -129,7 +128,7 @@ def fetch_repository_data(url, query=''):
 
     response = requests.get(url=URL + url + '?' + query, auth=HTTPBasicAuth(*credentials))
     if not response.ok:
-        raise ValueError("Bad response - status code:{}\n{}".format(response.status_code, response.text))
+        raise ValueError("Bad response - status code: {}\n{}".format(response.status_code, response.text))
     return response.json()
 
 
