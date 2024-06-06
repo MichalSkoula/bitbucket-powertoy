@@ -29,7 +29,7 @@ def index(what='open'):
     # get all repositories
     try:
         repositories = fetch_repository_data('repositories/' + session['owner'], 'pagelen=100')
-    except Exception as e:
+    except ValueError as e:
         flash(str(e))
         return redirect(url_for('logout'))
 
@@ -104,7 +104,7 @@ def login():
 
         session['account_id'] = acc_id
         flash('You were successfully logged in')
-        return redirect(url_for('index'))
+    return redirect(url_for('index'))
 
 
 @app.route("/logout", methods=['GET'])
