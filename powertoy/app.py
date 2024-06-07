@@ -41,7 +41,6 @@ def index(what='open'):
 
         for issues in issues_collection:
             issues = issues.json().get('values')
-
             if not issues or not issues[0]['repository']['full_name'] == repository['full_name']:
                 # no issues or repo does not have issue tracker?
                 continue
@@ -133,21 +132,21 @@ def fetch_repository_data(url, query=''):
 
 
 # async - grequests
-def load_issues(repositories, issue_state, show_only_critical_issues=False):
+def load_issues(repositories, issue_state, only_critical_and_blocker=False):
     # first, prepare get requests
     regs = []
-    ISSUE_STATES_QUERY_MAP = {
+    DEFAULT_QUERY = '(state="new" OR state="open")'
+    ISSUE_STATES_MAP = {
         'hold': '(state="on hold")',
         'resolved': '(state="resolved")',
-        True: 'AND (priority > "major")'
     }
 
     for repository in repositories:
         # https://developer.atlassian.com/cloud/bitbucket/rest/intro#filtering
-        current_issue_state = ISSUE_STATES_QUERY_MAP.get(
-            show_only_critical_issues if show_only_critical_issues else issue_state,
-            '(state="new" OR state="open")'
-        )
+        current_issue_state = ISSUE_STATES_MAP.get(issue_state, DEFAULT_QUERY)
+
+        if only_critical_and_blocker:
+            current_issue_state += ' AND (priority > "major")'
 
         regs.append(
             grequests.get(
