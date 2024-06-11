@@ -40,6 +40,7 @@ def index(what='open'):
     for repository in repositories['values']:
 
         for issues in issues_collection:
+            
             issues = issues.json().get('values')
             if not issues or not issues[0]['repository']['full_name'] == repository['full_name']:
                 # no issues or repo does not have issue tracker?
@@ -50,19 +51,19 @@ def index(what='open'):
             repositories_with_issues[repository['full_name']] = len(issues)
 
             for issue in issues:
-                if (show_all_assignment_on_resolved_issues is not True or what != 'resolved') and (
-                        issue['assignee'] is None or issue['assignee']['account_id'] != session['account_id']):
-                    # filter out issues that are not assigned to currently logged-in user
-                    continue
-
-                # show only my issues....or ALL issues if what=resolved
                 repository['open_issues'].append(issue)
-                issues_count += 1
 
-                # Check if the key exists in the dictionary, if not, return 0 and add 1
-                if issue['assignee'] is not None:
+                if issue['assignee']:
+                    # Check if the key exists in the dictionary, if not, return 0 and add 1
                     user_issue_count[issue['assignee']['display_name']] = user_issue_count.get(
                         issue['assignee']['display_name'], 0) + 1
+
+                if (show_all_assignment_on_resolved_issues is not True or what != 'resolved') and (
+                        issue['assignee'] is None or issue['assignee']['account_id'] != session['account_id']):
+                    # show only my issues....or ALL issues if what=resolved
+                    continue
+
+                issues_count += 1
 
     # sort user_issue_count by value desc
     user_issue_count = dict(sorted(user_issue_count.items(), key=lambda item: item[1], reverse=True))
