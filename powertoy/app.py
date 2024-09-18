@@ -11,9 +11,7 @@ app = Flask(__name__)
 # SETTINGS START #
 URL = "https://api.bitbucket.org/2.0/"
 app.secret_key = "asdasdadadsasd"
-SHOW_ALL_ASSIGNMENTS_ON_RESOLVED_ISSUES_PAGE = False
 # SETTINGS END #
-
 
 @app.route("/")
 @app.route("/<what>")
@@ -59,11 +57,13 @@ def index(what="open"):
                     user_issue_count[issue["assignee"]["display_name"]] = (
                         user_issue_count.get(issue["assignee"]["display_name"], 0) + 1
                     )
+                elif session["not_assigned"] == False:
+                    continue
 
-                # show only my issues....or ALL issues if what=resolved
+
+                # show only my issues....or ALL issues if what=resolved or what=hold
                 if (
-                    SHOW_ALL_ASSIGNMENTS_ON_RESOLVED_ISSUES_PAGE is False
-                    or what != "resolved"
+                    what != "resolved" and what != "hold"
                 ) and (
                     issue["assignee"]
                     and issue["assignee"]["account_id"] != session["account_id"]
@@ -107,6 +107,7 @@ def login():
         session["username"] = request.form.get("username")
         session["password"] = request.form.get("password")
         session["critical"] = request.form.get("critical") is not None
+        session["not_assigned"] = request.form.get("not_assigned") is not None
         session["owner"] = (
             request.form.get("owner")
             if request.form.get("owner")
