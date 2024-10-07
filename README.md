@@ -1,3 +1,6 @@
+# this project is feature-complete
+You should migrate your repositories to GitHub or other place, where they actually value your money and fix things.
+
 # bitbucket-powertoy
 A unique way of displaying all your issues across all your BitBuckets' repositories. All in one place, in a nicely sortable table. A real boost to productivity!
 
