@@ -2,7 +2,6 @@ import os
 import urllib.parse
 
 from flask import Flask, session, render_template, request, flash, redirect, url_for
-import grequests
 import requests
 from requests.auth import HTTPBasicAuth
 
@@ -161,16 +160,16 @@ def fetch_repository_data(url, query=""):
     return response.json()
 
 
-# async - grequests
+# synchronous requests
 def load_issues(repositories, issue_state, only_critical_and_blocker=False):
-    # first, prepare get requests
-    regs = []
     DEFAULT_QUERY = '(state="new" OR state="open")'
     ISSUE_STATES_MAP = {
         "hold": '(state="on hold")',
         "resolved": '(state="resolved")',
     }
-
+    
+    responses = []
+    
     for repository in repositories:
         # https://developer.atlassian.com/cloud/bitbucket/rest/intro#filtering
         current_issue_state = ISSUE_STATES_MAP.get(issue_state, DEFAULT_QUERY)
@@ -178,21 +177,30 @@ def load_issues(repositories, issue_state, only_critical_and_blocker=False):
         if only_critical_and_blocker:
             current_issue_state += ' AND (priority > "major")'
 
-        regs.append(
-            grequests.get(
-                URL
-                + "repositories/"
-                + session["owner"]
-                + "/"
-                + repository["slug"]
-                + "/issues?pagelen=100&sort=-updated_on&q="
-                + urllib.parse.quote_plus(current_issue_state),
+        url = (
+            URL
+            + "repositories/"
+            + session["owner"]
+            + "/"
+            + repository["slug"]
+            + "/issues?pagelen=100&sort=-updated_on&q="
+            + urllib.parse.quote_plus(current_issue_state)
+        )
+        
+        try:
+            response = requests.get(
+                url,
                 auth=HTTPBasicAuth(session["username"], session["password"]),
             )
-        )
+            responses.append(response)
+        except requests.RequestException:
+            # Create a mock response object for failed requests
+            class MockResponse:
+                def json(self):
+                    return {"values": []}
+            responses.append(MockResponse())
 
-    # fire all get requests at once
-    return grequests.map(regs)
+    return responses
 
 
 if __name__ == "__main__":
